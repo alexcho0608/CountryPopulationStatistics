@@ -19,11 +19,11 @@ public class CountryPopulationAggregator : ICountryPopulationAggregator
     {
         try
         {
-            _logger?.LogInformation("Starting to aggregate country populations from DB and external API");
+            _logger.LogInformation("Starting to aggregate country populations from DB and external API");
             var dbTaskList = new List<Task<List<Country>>>();
             foreach (var statService in _statServices) 
             {
-                dbTaskList.Add(SafeRunTask(statService.GetCountryPopulationsAsync));
+                dbTaskList.Add(SafeRunTask(statService.GetCountryPopulationsAsync, statService.GetType().Name));
             }
 
             await Task.WhenAll(dbTaskList);
@@ -40,18 +40,18 @@ public class CountryPopulationAggregator : ICountryPopulationAggregator
                 }
             }
 
-            _logger?.LogInformation("Aggregated {Count} countries (DB overrides external)", result.Count);
+            _logger.LogInformation("Aggregated population for {Count} countries ", result.Count);
             return result.Values.OrderBy(c => c.Name).ToList();
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failure during statistics data aggregation");
+            _logger.LogError(ex, "Failure during statistics data aggregation");
         }
 
         return Enumerable.Empty<Country>();
     }
 
-    private async Task<List<Country>> SafeRunTask(Func<Task<List<Country>>> func)
+    private async Task<List<Country>> SafeRunTask(Func<Task<List<Country>>> func, string serviceName)
     {
         try
         {
@@ -60,8 +60,8 @@ public class CountryPopulationAggregator : ICountryPopulationAggregator
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to retrieve country populations from " + func.Method.Name + ex);
+            _logger.LogError(ex, "Failed to retrieve country populations from " + serviceName);
         }
-        return null;
+        return new List<Country>();
     }
 }

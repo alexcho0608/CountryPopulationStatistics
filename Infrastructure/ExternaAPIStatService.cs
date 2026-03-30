@@ -49,7 +49,7 @@ public class ExternaAPIStatService : IStatService
         var result = data
                 .Select(t => new Country { Name = t.Item1, Population = t.Item2 })
                 .ToList();
-        _logger?.LogInformation("Loaded {Count} countries from external API", result?.Count ?? 0);
+        _logger.LogInformation("Loaded {Count} countries from external API", result?.Count ?? 0);
         return result;
     }
 
