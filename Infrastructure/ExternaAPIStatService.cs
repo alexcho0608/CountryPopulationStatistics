@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.External;
 
-public class ExternaAPIStatService : IStatService
+public class ExternalAPIStatService : IStatService
 {
-    private readonly ILogger<ExternaAPIStatService> _logger;
+    private readonly ILogger<ExternalAPIStatService> _logger;
 
-    public ExternaAPIStatService(ILogger<ExternaAPIStatService> logger)
+    public ExternalAPIStatService(ILogger<ExternalAPIStatService> logger)
     {
         _logger = logger;
     }

@@ -32,7 +32,7 @@ class Program
                 }); 
                 services.AddSingleton<ICountryRepository, CountryRepository>();
                 services.AddSingleton<IStatService, Infrastructure.DbStatService>();
-                services.AddSingleton<IStatService, Infrastructure.External.ExternaAPIStatService>();
+                services.AddSingleton<IStatService, Infrastructure.External.ExternalAPIStatService>();
                 services.AddSingleton<ICountryPopulationAggregator, CountryPopulationAggregator>();
             })
             .Build();
