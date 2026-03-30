@@ -6,14 +6,12 @@ namespace Services.Application;
 
 public class CountryPopulationAggregator : ICountryPopulationAggregator
 {
-    private readonly IStatService _dbService;
-    private readonly IStatService _externalService;
+    private readonly IEnumerable<IStatService> _statServices;
     private readonly ILogger<CountryPopulationAggregator> _logger;
 
     public CountryPopulationAggregator(IEnumerable<IStatService> statServices, ILogger<CountryPopulationAggregator> logger)
     {
-        _dbService = statServices.ElementAt(0) ?? throw new ArgumentNullException(nameof(_dbService));
-        _externalService = statServices.ElementAt(1) ?? throw new ArgumentNullException(nameof(_externalService));
+        _statServices = statServices;
         _logger = logger;
     }
 
@@ -22,11 +20,11 @@ public class CountryPopulationAggregator : ICountryPopulationAggregator
         try
         {
             _logger?.LogInformation("Starting to aggregate country populations from DB and external API");
-            var dbTaskList = new List<Task<List<Country>>> 
-            { 
-                SafeRunTask(_dbService.GetCountryPopulationsAsync) ,
-                SafeRunTask(_externalService.GetCountryPopulationsAsync) 
-            };
+            var dbTaskList = new List<Task<List<Country>>>();
+            foreach (var statService in _statServices) 
+            {
+                dbTaskList.Add(SafeRunTask(statService.GetCountryPopulationsAsync));
+            }
 
             await Task.WhenAll(dbTaskList);
             var result = new Dictionary<string, Country>(StringComparer.OrdinalIgnoreCase);
